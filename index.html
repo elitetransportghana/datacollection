@@ -678,7 +678,7 @@
                     }
                 },
 
-        async resetPassword() {
+       async resetPassword() {
                      this.auth.error = '';
                      try {
                         const res = await fetch(`${this.apiUrl}/reset-password`, {
@@ -693,8 +693,8 @@
                         this.auth.success = 'Password updated! Redirecting to login...';
                         
                         setTimeout(() => {
-                            // FIXED: Redirect to current path (removes ?resetToken=... but keeps folder)
-                            window.location.href = window.location.href.split('?')[0]; 
+                            // FIXED: Reloads the current page path, stripping query params automatically
+                            window.location.href = window.location.pathname; 
                         }, 2000);
 
                      } catch(e) {
@@ -705,8 +705,8 @@
                 logout() {
                     this.token = '';
                     localStorage.removeItem('elite_token');
-                    // FIXED: Redirect to current path to ensure we don't lose the folder
-                    window.location.href = window.location.href.split('?')[0];
+                    // FIXED: Reloads the current page path
+                    window.location.href = window.location.pathname;
                 },
 
                 async submitEntry() {
