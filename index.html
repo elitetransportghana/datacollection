@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elite Transport | Pro Portal</title>
-    
+    <link rel="manifest" href="manifest.json">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -269,9 +269,23 @@
 
                 <form @submit.prevent="submitEntry" class="space-y-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="md:col-span-2">
+                        <div class="md:col-span-2" x-data="{ open: false, regions: [
+                            'Ahafo Region', 'Ashanti Region', 'Bono Region', 'Bono East Region', 'Central Region',
+                            'Eastern Region', 'Greater Accra Region', 'North East Region', 'Northern Region', 'Oti Region',
+                            'Savannah Region', 'Upper East Region', 'Upper West Region', 'Volta Region', 'Western Region', 'Western North Region'
+                        ] }">
                              <label class="block text-xs uppercase tracking-wider text-gray-500 mb-1.5 ml-1">Region of Residence</label>
-                             <input x-model="form.address" placeholder="e.g. Northern Region" class="elite-input" required>
+                             <div class="relative">
+                                <input type="text" x-model="form.address" @focus="open = true" @click.outside="open = false" class="elite-input" placeholder="Select or Search Region..." required>
+                                <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                                    <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                                </div>
+                                <div x-show="open" x-transition class="absolute z-20 w-full mt-2 bg-[#121212] border border-elite-green/50 rounded-lg shadow-2xl max-h-48 overflow-y-auto">
+                                    <template x-for="region in regions.filter(r => r.toLowerCase().includes(form.address.toLowerCase()))">
+                                        <div @click="form.address = region; open = false" class="px-4 py-3 hover:bg-elite-green/40 cursor-pointer text-sm border-b border-white/5 last:border-0" x-text="region"></div>
+                                    </template>
+                                </div>
+                             </div>
                         </div>
                         
                         <div>
@@ -580,7 +594,9 @@
                         CREATE ACCOUNT & SEND EMAIL
                     </button>
                 </form>
-                <div x-show="userMessage" class="mt-4 p-3 bg-green-900/20 text-green-400 text-center rounded border border-green-900/50 text-sm" x-text="userMessage"></div>
+                <div x-show="userMessage" class="mt-4 p-3 rounded border text-sm text-center"
+                     :class="userMessageStatus === 'error' ? 'bg-red-900/20 border-red-900/50 text-red-400' : 'bg-green-900/20 border-green-900/50 text-green-400'"
+                     x-text="userMessage"></div>
             </div>
         </div>
 
@@ -603,7 +619,8 @@
                 stats: {},
                 dataList: [],
                 adminList: [],
-                message: '', status: '', userMessage: '',
+                message: '', status: '', 
+                userMessage: '', userMessageStatus: '', // Added status for dynamic color
                 resetToken: '',
 
                 init() {
@@ -730,18 +747,24 @@
 
                 async createUser() {
                     this.userMessage = 'Creating User & Sending Email...';
+                    this.userMessageStatus = 'loading';
                     try {
                         const res = await fetch(`${this.apiUrl}/admin/create-user`, {
                             method: 'POST',
                             headers: { 'Authorization': `Bearer ${this.token}`, 'Content-Type': 'application/json' },
                             body: JSON.stringify(this.newUser)
                         });
-                        if(!res.ok) throw new Error('Failed');
+                        
+                        const data = await res.json(); // Capture backend response
+                        if(!res.ok) throw new Error(data.error || 'Failed'); // Throw specific backend error
+
+                        this.userMessageStatus = 'success';
                         this.userMessage = 'User Created & Email Sent!';
                         this.newUser = { fullName:'', username:'', password:'', role:'worker', supervisorId:'' };
                         this.fetchUsers(); 
                     } catch(e) {
-                        this.userMessage = 'Error creating user.';
+                        this.userMessageStatus = 'error';
+                        this.userMessage = e.message;
                     }
                 }
             }
