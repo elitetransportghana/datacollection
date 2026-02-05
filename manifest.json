@@ -1,0 +1,22 @@
+{
+  "name": "Elite Transport Pro",
+  "short_name": "Elite Pro",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#D4AF37",
+  "description": "Staff portal for Elite Transport data collection and management.",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://firebasestorage.googleapis.com/v0/b/mealone-29b00.firebasestorage.app/o/ELITE%20TRANSPORT.png?alt=media&token=0be7bd05-6b0d-4c21-a7b4-729cda707fe3",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://firebasestorage.googleapis.com/v0/b/mealone-29b00.firebasestorage.app/o/ELITE%20TRANSPORT.png?alt=media&token=0be7bd05-6b0d-4c21-a7b4-729cda707fe3",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
