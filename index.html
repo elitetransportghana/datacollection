@@ -211,7 +211,7 @@
                          alt="Logo" class="relative h-24 w-24 md:h-28 md:w-28 object-contain transition-transform duration-300 hover:scale-105">
                 </div>
                 <div>
-                    <h1 class="text-3xl md:text-4xl font-bold text-white tracking-wide">ELITE <span class="text-elite-light font-light">TRANSPORT</span></h1>
+                    <h1 class="text-3xl md:text-4xl font-bold text-white tracking-wide">ELITE <span class="text-elite-light font-light">PRO</span></h1>
                     <div class="flex items-center justify-center sm:justify-start gap-2 text-sm text-gray-400 mt-1">
                         <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
                         <span>Logged in as <span x-text="user.name" class="text-white font-medium"></span></span>
@@ -399,7 +399,7 @@
                                 <option>Level 400</option>
                                 <option>Level 500</option>
                                 <option>Level 600</option>
-                                
+                                <option>Masters</option>
                             </select>
                         </div>
                     </div>
@@ -648,8 +648,59 @@
             <div class="glass-panel w-full max-w-lg rounded-2xl p-6 relative">
                 <h3 class="text-xl font-bold text-white mb-4">Edit Entry</h3>
                 <form @submit.prevent="submitEdit" class="space-y-4">
-                    <input x-model="editData.name" class="elite-input" placeholder="Full Name">
-                    <input x-model="editData.contact" class="elite-input" placeholder="Contact">
+                    
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-500 mb-1 ml-1">Full Name</label>
+                        <input x-model="editData.name" class="elite-input" placeholder="Full Name" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-500 mb-1 ml-1">Contact</label>
+                        <input x-model="editData.contact" class="elite-input" placeholder="Contact" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-500 mb-1 ml-1">Region</label>
+                        <select x-model="editData.address" class="elite-input bg-[#0D0D0D]">
+                            <option value="" disabled>Select Region</option>
+                            <option>Ahafo Region</option>
+                            <option>Ashanti Region</option>
+                            <option>Bono Region</option>
+                            <option>Bono East Region</option>
+                            <option>Central Region</option>
+                            <option>Eastern Region</option>
+                            <option>Greater Accra Region</option>
+                            <option>North East Region</option>
+                            <option>Northern Region</option>
+                            <option>Oti Region</option>
+                            <option>Savannah Region</option>
+                            <option>Upper East Region</option>
+                            <option>Upper West Region</option>
+                            <option>Volta Region</option>
+                            <option>Western Region</option>
+                            <option>Western North Region</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-500 mb-1 ml-1">Course</label>
+                        <input x-model="editData.course" class="elite-input" placeholder="Course of Study" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider text-gray-500 mb-1 ml-1">Level</label>
+                        <select x-model="editData.level" class="elite-input bg-[#0D0D0D]">
+                            <option value="" disabled>Select Level</option>
+                            <option>Level 100</option>
+                            <option>Level 200</option>
+                            <option>Level 300</option>
+                            <option>Level 400</option>
+                            <option>Level 500</option>
+                            <option>Level 600</option>
+                            <option>Masters</option>
+                        </select>
+                    </div>
+
                     <div class="flex justify-end gap-3 mt-6">
                         <button type="button" @click="showEditModal = false" class="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
                         <button type="submit" class="bg-elite-gold text-black px-4 py-2 rounded text-sm font-bold hover:bg-yellow-500">Update</button>
