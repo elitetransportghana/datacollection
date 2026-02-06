@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     
@@ -223,7 +224,7 @@
                         @click="view = 'stats'" 
                         :class="view === 'stats' ? 'active' : ''"
                         class="nav-btn px-4 md:px-6 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     <span class="hidden sm:inline">Overview</span>
                     <span class="sm:hidden">Stats</span>
                 </button>
@@ -401,11 +402,6 @@
                                 
                             </select>
                         </div>
-                        
-                        <div>
-                            <label class="block text-xs uppercase tracking-wider text-gray-500 mb-1.5 ml-1">Number on Roll</label>
-                            <input type="number" x-model="form.numberOnRoll" placeholder="000" class="elite-input">
-                        </div>
                     </div>
 
                     <button type="submit" class="w-full btn-primary py-4 rounded-xl shadow-lg mt-8 flex justify-center items-center gap-2">
@@ -427,7 +423,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="glass-panel p-6 rounded-2xl relative overflow-hidden group">
                     <div class="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition">
-                        <svg class="w-24 h-24 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        <svg class="w-24 h-24 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     </div>
                     <p class="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">Total Records</p>
                     <p class="text-5xl font-bold text-white tracking-tight" x-text="stats.totalEntries || 0"></p>
@@ -512,24 +508,66 @@
             </div>
 
             <div class="glass-panel rounded-2xl overflow-hidden">
-                <div class="p-6 border-b border-white/5 flex justify-between items-center">
+                <div class="p-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
                     <h3 class="text-sm font-bold uppercase tracking-widest text-gray-400">Recent Entries Log</h3>
-                    <button class="text-xs text-elite-green hover:text-white transition">Export Data</button>
+                    
+                    <div class="flex items-center gap-2">
+                        <button @click="$refs.fileInput.click()" class="text-xs bg-white/10 text-white px-3 py-1.5 rounded font-bold hover:bg-white/20 transition animate-fade-in-up">
+                            Import Data
+                        </button>
+                        <input x-ref="fileInput" type="file" hidden accept=".csv, .xlsx, .xls" @change="handleFileUpload">
+
+                        <button x-show="selectedIds.length > 0 && user.role !== 'worker'" 
+                                @click="openDelegateModal"
+                                class="text-xs bg-elite-gold text-black px-3 py-1.5 rounded font-bold hover:bg-yellow-500 transition animate-fade-in-up">
+                            Delegate (<span x-text="selectedIds.length"></span>)
+                        </button>
+                        <button class="text-xs text-elite-green hover:text-white transition">Export Data</button>
+                    </div>
                 </div>
+
+                <div class="px-6 pb-4 flex flex-wrap gap-2">
+                    <select x-model="filters.course" class="bg-gray-800 text-xs text-white p-2 rounded border border-gray-700 focus:ring-0">
+                        <option value="">All Courses</option>
+                        <template x-for="c in uniqueCourses">
+                            <option :value="c" x-text="c"></option>
+                        </template>
+                    </select>
+                    <select x-model="filters.level" class="bg-gray-800 text-xs text-white p-2 rounded border border-gray-700 focus:ring-0">
+                        <option value="">All Levels</option>
+                        <template x-for="l in uniqueLevels">
+                            <option :value="l" x-text="l"></option>
+                        </template>
+                    </select>
+                    <select x-model="filters.region" class="bg-gray-800 text-xs text-white p-2 rounded border border-gray-700 focus:ring-0">
+                        <option value="">All Regions</option>
+                        <template x-for="r in uniqueRegions">
+                            <option :value="r" x-text="r"></option>
+                        </template>
+                    </select>
+                </div>
+
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm text-gray-400">
                         <thead class="bg-[#050505] text-xs uppercase font-semibold text-gray-500">
                             <tr>
+                                <th x-show="user.role !== 'worker'" class="p-4 w-10">
+                                    <input type="checkbox" @change="toggleSelectAll" class="rounded bg-gray-800 border-gray-700 text-elite-gold focus:ring-0">
+                                </th>
                                 <th class="p-4">Staff Agent</th>
                                 <th class="p-4">Student Name</th>
                                 <th class="p-4">Region</th>
                                 <th class="p-4">Course</th>
                                 <th class="p-4">Contact</th>
+                                <th class="p-4 text-right">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-white/5">
-                            <template x-for="row in dataList">
+                            <template x-for="row in filteredData">
                                 <tr class="hover:bg-white/5 transition duration-150">
+                                    <td x-show="user.role !== 'worker'" class="p-4">
+                                        <input type="checkbox" :value="row.id" x-model="selectedIds" class="rounded bg-gray-800 border-gray-700 text-elite-gold focus:ring-0">
+                                    </td>
                                     <td class="p-4">
                                         <div class="flex items-center gap-2">
                                             <div class="w-6 h-6 rounded-full bg-elite-green flex items-center justify-center text-[10px] text-white font-bold" x-text="row.staff_name.charAt(0)"></div>
@@ -542,6 +580,12 @@
                                         <span class="px-2 py-1 rounded text-xs bg-gray-800 border border-gray-700 text-gray-300" x-text="row.course"></span>
                                     </td>
                                     <td class="p-4 font-mono text-xs" x-text="row.contact"></td>
+                                    
+                                    <td class="p-4 text-right">
+                                        <button @click="openEditModal(row)" class="text-gray-500 hover:text-elite-gold transition">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                                        </button>
+                                    </td>
                                 </tr>
                             </template>
                         </tbody>
@@ -600,6 +644,77 @@
             </div>
         </div>
 
+        <div x-show="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" style="display:none;">
+            <div class="glass-panel w-full max-w-lg rounded-2xl p-6 relative">
+                <h3 class="text-xl font-bold text-white mb-4">Edit Entry</h3>
+                <form @submit.prevent="submitEdit" class="space-y-4">
+                    <input x-model="editData.name" class="elite-input" placeholder="Full Name">
+                    <input x-model="editData.contact" class="elite-input" placeholder="Contact">
+                    <div class="flex justify-end gap-3 mt-6">
+                        <button type="button" @click="showEditModal = false" class="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
+                        <button type="submit" class="bg-elite-gold text-black px-4 py-2 rounded text-sm font-bold hover:bg-yellow-500">Update</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div x-show="showDelegateModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" style="display:none;">
+            <div class="glass-panel w-full max-w-md rounded-2xl p-6 relative">
+                <h3 class="text-xl font-bold text-white mb-2">Delegate Work</h3>
+                <p class="text-xs text-gray-400 mb-6">Select a worker to assign <span class="text-elite-gold" x-text="selectedIds.length"></span> entries to.</p>
+                
+                <div class="space-y-2 max-h-64 overflow-y-auto custom-scrollbar mb-6">
+                    <template x-for="w in workersWithLoad">
+                        <div @click="delegationTarget = w.id" 
+                             class="p-3 rounded border cursor-pointer flex justify-between items-center transition"
+                             :class="delegationTarget === w.id ? 'bg-elite-gold/20 border-elite-gold' : 'bg-white/5 border-transparent hover:bg-white/10'">
+                            <div>
+                                <p class="text-sm text-white font-medium" x-text="w.name"></p>
+                                <p class="text-[10px] text-gray-500" x-text="w.role"></p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs font-mono font-bold" :class="w.load >= 150 ? 'text-red-400' : 'text-green-400'" x-text="w.load"></span>
+                                <p class="text-[10px] text-gray-500">Entries</p>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <button type="button" @click="showDelegateModal = false" class="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
+                    <button type="button" @click="submitDelegate" class="bg-elite-gold text-black px-4 py-2 rounded text-sm font-bold hover:bg-yellow-500" :disabled="!delegationTarget">Assign</button>
+                </div>
+            </div>
+        </div>
+
+        <div x-show="showImportModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" style="display:none;">
+            <div class="glass-panel w-full max-w-2xl rounded-2xl p-6 relative flex flex-col max-h-[90vh]">
+                <h3 class="text-xl font-bold text-white mb-2">Map Columns</h3>
+                <p class="text-xs text-gray-400 mb-4">Match the file headers to the system fields.</p>
+                
+                <div class="overflow-y-auto custom-scrollbar flex-1 space-y-4 pr-2">
+                    <template x-for="field in importFields">
+                        <div>
+                            <label class="block text-xs uppercase tracking-wider text-gray-500 mb-1.5 ml-1" x-text="field.label"></label>
+                            <select x-model="importMapping[field.key]" class="elite-input bg-[#0D0D0D]">
+                                <option value="">-- Skip Column --</option>
+                                <template x-for="header in fileHeaders">
+                                    <option :value="header" x-text="header"></option>
+                                </template>
+                            </select>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-white/5">
+                    <button type="button" @click="showImportModal = false" class="px-4 py-2 text-sm text-gray-400 hover:text-white">Cancel</button>
+                    <button type="button" @click="processImport" class="bg-elite-gold text-black px-4 py-2 rounded text-sm font-bold hover:bg-yellow-500">
+                        <span x-text="importing ? 'Importing...' : 'Start Import'"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -620,8 +735,52 @@
                 dataList: [],
                 adminList: [],
                 message: '', status: '', 
-                userMessage: '', userMessageStatus: '', // Added status for dynamic color
+                userMessage: '', userMessageStatus: '',
                 resetToken: '',
+
+                selectedIds: [],
+                showEditModal: false,
+                editData: {},
+                showDelegateModal: false,
+                workersWithLoad: [],
+                delegationTarget: '',
+
+                // NEW STATES FOR FILTERS AND IMPORT
+                filters: { course: '', level: '', region: '' },
+                showImportModal: false,
+                fileHeaders: [],
+                importedData: [],
+                importMapping: {},
+                importing: false,
+                importFields: [
+                    { label: 'Full Name', key: 'name' },
+                    { label: 'Contact Number', key: 'contact' },
+                    { label: 'Region of Residence', key: 'address' },
+                    { label: 'Course of Study', key: 'course' },
+                    { label: 'Level', key: 'level' },
+                    { label: 'Number on Roll', key: 'numberOnRoll' }
+                ],
+
+                // --- NEW FILTER LOGIC ---
+                get filteredData() {
+                    return this.dataList.filter(row => {
+                        const matchCourse = this.filters.course === '' || row.course === this.filters.course;
+                        const matchLevel = this.filters.level === '' || row.level === this.filters.level;
+                        const matchRegion = this.filters.region === '' || row.address === this.filters.region;
+                        return matchCourse && matchLevel && matchRegion;
+                    });
+                },
+
+                get uniqueCourses() {
+                    return [...new Set(this.dataList.map(item => item.course))].sort();
+                },
+                get uniqueLevels() {
+                    return [...new Set(this.dataList.map(item => item.level))].sort();
+                },
+                get uniqueRegions() {
+                    return [...new Set(this.dataList.map(item => item.address))].sort();
+                },
+                // ------------------------
 
                 init() {
                     const urlParams = new URLSearchParams(window.location.search);
@@ -678,7 +837,7 @@
                     }
                 },
 
-       async resetPassword() {
+                async resetPassword() {
                      this.auth.error = '';
                      try {
                         const res = await fetch(`${this.apiUrl}/reset-password`, {
@@ -686,14 +845,12 @@
                             body: JSON.stringify({ token: this.resetToken, newPassword: this.auth.newPassword })
                         });
                         
-                        // Check if endpoint exists (Backend might not be deployed if this 404s)
                         if (res.status === 404) throw new Error('System update required. (Deploy Worker)');
                         if (!res.ok) throw new Error('Invalid or expired token');
                         
                         this.auth.success = 'Password updated! Redirecting to login...';
                         
                         setTimeout(() => {
-                            // FIXED: Reloads the current page path, stripping query params automatically
                             window.location.href = window.location.pathname; 
                         }, 2000);
 
@@ -705,7 +862,6 @@
                 logout() {
                     this.token = '';
                     localStorage.removeItem('elite_token');
-                    // FIXED: Reloads the current page path
                     window.location.href = window.location.pathname;
                 },
 
@@ -724,7 +880,6 @@
                         this.status = 'success';
                         this.message = 'Entry Recorded Successfully';
                         this.form = { address:'', name:'', contact:'', course:'', level:'', numberOnRoll:'', customCourse:'' };
-                        // Refetch stats if admin is submitting
                         if(this.user.role !== 'worker') this.fetchStats();
                     } catch(e) {
                         this.status = 'error';
@@ -762,8 +917,8 @@
                             body: JSON.stringify(this.newUser)
                         });
                         
-                        const data = await res.json(); // Capture backend response
-                        if(!res.ok) throw new Error(data.error || 'Failed'); // Throw specific backend error
+                        const data = await res.json(); 
+                        if(!res.ok) throw new Error(data.error || 'Failed'); 
 
                         this.userMessageStatus = 'success';
                         this.userMessage = 'User Created & Email Sent!';
@@ -773,6 +928,138 @@
                         this.userMessageStatus = 'error';
                         this.userMessage = e.message;
                     }
+                },
+
+                toggleSelectAll(e) {
+                    if (e.target.checked) {
+                        this.selectedIds = this.filteredData.map(row => row.id); // CHANGED to match filtered view
+                    } else {
+                        this.selectedIds = [];
+                    }
+                },
+
+                openEditModal(row) {
+                    this.editData = { ...row }; 
+                    this.showEditModal = true;
+                },
+
+                async submitEdit() {
+                    try {
+                        const res = await fetch(`${this.apiUrl}/admin/update-entry`, {
+                            method: 'POST',
+                            headers: { 'Authorization': `Bearer ${this.token}`, 'Content-Type': 'application/json' },
+                            body: JSON.stringify(this.editData)
+                        });
+                        if(!res.ok) throw new Error('Update Failed');
+                        this.showEditModal = false;
+                        this.fetchStats(); 
+                    } catch(e) {
+                        alert(e.message);
+                    }
+                },
+
+                async openDelegateModal() {
+                    try {
+                        const res = await fetch(`${this.apiUrl}/admin/workers-load`, {
+                            headers: { 'Authorization': `Bearer ${this.token}` }
+                        });
+                        this.workersWithLoad = await res.json();
+                        this.showDelegateModal = true;
+                    } catch(e) {
+                        alert("Could not load workers list");
+                    }
+                },
+
+                async submitDelegate() {
+                    try {
+                        const res = await fetch(`${this.apiUrl}/admin/delegate`, {
+                            method: 'POST',
+                            headers: { 'Authorization': `Bearer ${this.token}`, 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                entryIds: this.selectedIds,
+                                targetWorkerId: this.delegationTarget
+                            })
+                        });
+                        if(!res.ok) throw new Error('Delegation Failed');
+                        
+                        this.showDelegateModal = false;
+                        this.selectedIds = []; 
+                        this.delegationTarget = '';
+                        this.fetchStats(); 
+                        alert("Work delegated successfully");
+                    } catch(e) {
+                        alert(e.message);
+                    }
+                },
+
+                handleFileUpload(e) {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, {type: 'array'});
+                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(sheet, {header: 1});
+                        
+                        if (jsonData.length > 0) {
+                            this.fileHeaders = jsonData[0];
+                            this.importedData = jsonData.slice(1);
+                            
+                            this.importMapping = {};
+                            this.importFields.forEach(f => this.importMapping[f.key] = '');
+                            
+                            this.showImportModal = true;
+                        }
+                    };
+                    reader.readAsArrayBuffer(file);
+                },
+
+                async processImport() {
+                    this.importing = true;
+                    const phoneRegex = /^(?:\+233|0)(2\d|3\d|5\d)\d{7}$/;
+                    let successCount = 0;
+
+                    for (const row of this.importedData) {
+                        const entry = {};
+                        let hasPhone = false;
+
+                        for (const field of this.importFields) {
+                            const header = this.importMapping[field.key];
+                            if (header) {
+                                const colIndex = this.fileHeaders.indexOf(header);
+                                entry[field.key] = row[colIndex] || ''; 
+                            } else {
+                                entry[field.key] = '';
+                            }
+                        }
+
+                        if (entry.contact) {
+                            const cleanContact = String(entry.contact).replace(/[\s-]/g, '');
+                            if (phoneRegex.test(cleanContact)) {
+                                entry.contact = cleanContact;
+                                hasPhone = true;
+                            }
+                        }
+
+                        if (hasPhone) {
+                            try {
+                                await fetch(`${this.apiUrl}/submit`, {
+                                    method: 'POST',
+                                    headers: { 'Authorization': `Bearer ${this.token}`, 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(entry)
+                                });
+                                successCount++;
+                            } catch (e) {
+                                console.log('Skipped duplicate or error row');
+                            }
+                        }
+                    }
+
+                    this.importing = false;
+                    this.showImportModal = false;
+                    this.$refs.fileInput.value = ''; 
+                    alert(`Import Complete. ${successCount} entries added.`);
+                    this.fetchStats();
                 }
             }
         }
