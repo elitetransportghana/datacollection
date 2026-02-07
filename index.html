@@ -697,7 +697,7 @@
                             <option>Level 400</option>
                             <option>Level 500</option>
                             <option>Level 600</option>
-                            
+                            <option>Masters</option>
                         </select>
                     </div>
 
@@ -1043,6 +1043,7 @@
                     }
                 },
 
+                // --- NEW IMPORT LOGIC ---
                 handleFileUpload(e) {
                     const file = e.target.files[0];
                     const reader = new FileReader();
@@ -1067,10 +1068,11 @@
 
                 async processImport() {
                     this.importing = true;
-                    const phoneRegex = /^(?:\+233|0)(2\d|3\d|5\d)\d{7}$/;
+                    const phoneRegex = /^(?:\+?233|0)(2\d|3\d|5\d)\d{7}$/;
                     let successCount = 0;
 
                     for (const row of this.importedData) {
+                        // Map Data based on user selection
                         const entry = {};
                         let hasPhone = false;
 
@@ -1078,15 +1080,25 @@
                             const header = this.importMapping[field.key];
                             if (header) {
                                 const colIndex = this.fileHeaders.indexOf(header);
-                                entry[field.key] = row[colIndex] || ''; 
+                                entry[field.key] = row[colIndex] || ''; // Allow empty strings
                             } else {
                                 entry[field.key] = '';
                             }
                         }
 
+                        // Validate Phone
                         if (entry.contact) {
-                            const cleanContact = String(entry.contact).replace(/[\s-]/g, '');
+                            // Only strip whitespace and dashes, KEEP '233' or '+' if present for regex
+                            let cleanContact = String(entry.contact).replace(/[\s-]/g, '');
+                            
                             if (phoneRegex.test(cleanContact)) {
+                                // Normalize for DB: Ensure it starts with 0
+                                if (cleanContact.startsWith('+233')) {
+                                    cleanContact = '0' + cleanContact.substring(4);
+                                } else if (cleanContact.startsWith('233')) {
+                                    cleanContact = '0' + cleanContact.substring(3);
+                                }
+                                
                                 entry.contact = cleanContact;
                                 hasPhone = true;
                             }
@@ -1108,7 +1120,7 @@
 
                     this.importing = false;
                     this.showImportModal = false;
-                    this.$refs.fileInput.value = ''; 
+                    this.$refs.fileInput.value = ''; // Reset input
                     alert(`Import Complete. ${successCount} entries added.`);
                     this.fetchStats();
                 }
